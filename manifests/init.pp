@@ -82,6 +82,6 @@ class aws_module_prereqs (
     owner   => $aws_user,
     group   => $aws_user_primary_group,
     mode    => 0400,
-    content => template('credentials.erb'),
+    content => template('aws_module_prereqs/credentials.erb'),
   }
 }
