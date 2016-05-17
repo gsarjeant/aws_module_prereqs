@@ -48,8 +48,8 @@
 #
 class aws_module_prereqs (
   Boolean $manage_aws_credentials  = false,
-  String  $aws_access_key_id       = undef,
-  String  $aws_secret_access_key   = undef,
+  String  $aws_access_key_id       = '',
+  String  $aws_secret_access_key   = '',
   String  $aws_user                = 'root',
   String  $aws_user_primary_group  = 'root',
   String  $aws_user_home_directory = '/root/'
