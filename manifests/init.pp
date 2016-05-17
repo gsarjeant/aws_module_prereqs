@@ -18,14 +18,14 @@
 #       Please don't store these credentials in hiera or define them in puppet code 
 #       in a publicly accessible location like github.
 #
-# aws_access_key_id       - the access key ID that you use for programmatic access to AWS
-# aws_secret_access_key   - the access key that you use for programmatic access to AWS
-# aws_user                - the user that will be invoking AWS commands
-#                           default: root
-# aws_user_primary_group  - the primary group of the user that will be invoking aws commands
-#                           default: root
-# aws_user_home_directory - the home directory of the user that will be invoking AWS commands
-#                           default: /root/
+# $aws_access_key_id       - the access key ID that you use for programmatic access to AWS
+# $aws_secret_access_key   - the access key that you use for programmatic access to AWS
+# $aws_user                - the user that will be invoking AWS commands
+#                            default: root
+# $aws_user_primary_group  - the primary group of the user that will be invoking aws commands
+#                            default: root
+# $aws_user_home_directory - the home directory of the user that will be invoking AWS commands
+#                            default: /root/
 #
 # Examples
 # --------
@@ -47,11 +47,11 @@
 # Copyright 2016 Greg Sarjeant, unless otherwise noted.
 #
 class aws_module_prereqs (
-  aws_access_key_id,
-  aws_secret_access_key,
-  aws_user = 'root',
-  aws_user_primary_group = 'root',
-  aws_user_home_directory = '/root/'
+  $aws_access_key_id,
+  $aws_secret_access_key,
+  $aws_user = 'root',
+  $aws_user_primary_group = 'root',
+  $aws_user_home_directory = '/root/'
 ){
 
   # ruby gems required by the aws module
