@@ -1,48 +1,87 @@
 # Class: aws_module_prereqs
 # ===========================
 #
-# Full description of class aws_module_prereqs here.
+# This module manages the items that must be in place in order to use the puppetlabs/aws
+# module to manage your AWS infrastructure. These items are:
+#
+# - gem dependencies
+#   - aws-sdk-core
+#   - retries
+# - AWS credentials file
+#   - root's ~/.aws/credentials
 #
 # Parameters
 # ----------
 #
-# Document parameters here.
+# NOTE: These values will allow anyone who can see them to use your AWS credentials to create AWS resources.
+#       They will appear in any catalogs and reports for puppet runs that set them.
+#       Please don't store these credentials in hiera or define them in puppet code 
+#       in a publicly accessible location like github.
 #
-# * `sample parameter`
-# Explanation of what this parameter affects and what it defaults to.
-# e.g. "Specify one or more upstream ntp servers as an array."
-#
-# Variables
-# ----------
-#
-# Here you should define a list of variables that this module would require.
-#
-# * `sample variable`
-#  Explanation of how this variable affects the function of this class and if
-#  it has a default. e.g. "The parameter enc_ntp_servers must be set by the
-#  External Node Classifier as a comma separated list of hostnames." (Note,
-#  global variables should be avoided in favor of class parameters as
-#  of Puppet 2.6.)
+# aws_access_key_id       - the access key ID that you use for programmatic access to AWS
+# aws_secret_access_key   - the access key that you use for programmatic access to AWS
+# aws_user                - the user that will be invoking AWS commands
+#                           default: root
+# aws_user_primary_group  - the primary group of the user that will be invoking aws commands
+#                           default: root
+# aws_user_home_directory - the home directory of the user that will be invoking AWS commands
+#                           default: /root/
 #
 # Examples
 # --------
 #
 # @example
 #    class { 'aws_module_prereqs':
-#      servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
+#      aws_access_key_id     => YOUR_AWS_ACCESS_KEY_ID,
+#      aws_secret_access_key => YOUR_AWS_SECRET_ACCESS_KEY
 #    }
 #
 # Authors
 # -------
 #
-# Author Name <author@domain.com>
+# Author Name Greg Sarjeant
 #
 # Copyright
 # ---------
 #
-# Copyright 2016 Your name here, unless otherwise noted.
+# Copyright 2016 Greg Sarjeant, unless otherwise noted.
 #
-class aws_module_prereqs {
+class aws_module_prereqs (
+  aws_access_key_id,
+  aws_secret_access_key,
+  aws_user = 'root',
+  aws_user_primary_group = 'root',
+  aws_user_home_directory = '/root/'
+){
 
+  # ruby gems required by the aws module
+  package { 'ruby_gem_aws-sdk-core':
+    name     => 'aws-sdk-core',
+    ensure   => present,
+    provider => 'puppet_gem',
+  }
 
+  package { 'ruby_gem_retries':
+    name     => 'retries',
+    ensure   => present,
+    provider => 'puppet_gem',
+  }
+
+  # aws credentials file
+  $aws_credentials_directory = "${aws_user_home_directory}/.aws"
+
+  file { $aws_credentials_directory}:
+    ensure => directory,
+    owner  => $aws_user,
+    group  => $aws_user_primary_group,
+    mode   => '0700',
+  }
+
+  file { "${aws_credentials_directory}/credentials":
+    ensure  => file,
+    owner   => $aws_user,
+    group   => $aws_user_primary_group,
+    mode    => 0400,
+    content => template('credentials.erb'),
+  }
 }
