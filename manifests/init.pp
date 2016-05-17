@@ -81,7 +81,7 @@ class aws_module_prereqs (
     ensure  => file,
     owner   => $aws_user,
     group   => $aws_user_primary_group,
-    mode    => 0400,
+    mode    => '0400',
     content => template('aws_module_prereqs/credentials.erb'),
   }
 }
