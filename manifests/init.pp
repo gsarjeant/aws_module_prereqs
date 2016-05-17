@@ -47,11 +47,12 @@
 # Copyright 2016 Greg Sarjeant, unless otherwise noted.
 #
 class aws_module_prereqs (
-  $aws_access_key_id,
-  $aws_secret_access_key,
-  $aws_user = 'root',
-  $aws_user_primary_group = 'root',
-  $aws_user_home_directory = '/root/'
+  Boolean $manage_aws_credentials  = false,
+  String  $aws_access_key_id       = undef,
+  String  $aws_secret_access_key   = undef,
+  String  $aws_user                = 'root',
+  String  $aws_user_primary_group  = 'root',
+  String  $aws_user_home_directory = '/root/'
 ){
 
   # ruby gems required by the aws module
@@ -67,21 +68,26 @@ class aws_module_prereqs (
     provider => 'puppet_gem',
   }
 
-  # aws credentials file
-  $aws_credentials_directory = "${aws_user_home_directory}/.aws"
-
-  file { $aws_credentials_directory:
-    ensure => directory,
-    owner  => $aws_user,
-    group  => $aws_user_primary_group,
-    mode   => '0700',
-  }
-
-  file { "${aws_credentials_directory}/credentials":
-    ensure  => file,
-    owner   => $aws_user,
-    group   => $aws_user_primary_group,
-    mode    => '0400',
-    content => template('aws_module_prereqs/credentials.erb'),
+  # This sucks, but it's how I'm going to handle the secrets question without parameterizing the role
+  # If you set $manage_aws_credentials to true, then you have to pass your credentials to this module.
+  # If you don't, then puppet will ignore the credentials file (that is, it won't be in the catalog).
+  if $manage_aws_credentials {
+    # aws credentials file
+    $aws_credentials_directory = "${aws_user_home_directory}/.aws"
+  
+    file { $aws_credentials_directory:
+      ensure => directory,
+      owner  => $aws_user,
+      group  => $aws_user_primary_group,
+      mode   => '0700',
+    }
+  
+    file { "${aws_credentials_directory}/credentials":
+      ensure  => file,
+      owner   => $aws_user,
+      group   => $aws_user_primary_group,
+      mode    => '0400',
+      content => template('aws_module_prereqs/credentials.erb'),
+    }
   }
 }
