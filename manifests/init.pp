@@ -70,7 +70,7 @@ class aws_module_prereqs (
   # aws credentials file
   $aws_credentials_directory = "${aws_user_home_directory}/.aws"
 
-  file { $aws_credentials_directory}:
+  file { $aws_credentials_directory:
     ensure => directory,
     owner  => $aws_user,
     group  => $aws_user_primary_group,
